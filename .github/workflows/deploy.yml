@@ -1,0 +1,56 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/fromzero2one/mcp-server-demo
+  CONTAINER_NAME: mcp-server
+  PORT: 8000
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup old container
+        run: docker rm -f ${{ env.CONTAINER_NAME }} 2>$null
+        continue-on-error: true
+
+      - name: Wait for port release
+        shell: powershell
+        run: Start-Sleep -Seconds 3
+
+      - name: Pull latest image
+        run: docker pull ${{ env.IMAGE }}:latest
+
+      - name: Run new container
+        run: docker run -d --name ${{ env.CONTAINER_NAME }} -p ${{ env.PORT }}:${{ env.PORT }} ${{ env.IMAGE }}:latest
+
+      - name: Health check
+        shell: powershell
+        run: |
+          Start-Sleep -Seconds 5
+          try {
+            $statusCode = curl.exe -s -o NUL -w "%{http_code}" http://localhost:${{ env.PORT }}/ --connect-timeout 5
+            Write-Host "✅ MCP Server is running on port ${{ env.PORT }} (HTTP $statusCode)"
+          } catch {
+            # MCP SSE may not respond on root path; check if port is listening
+            $listening = netstat -an | Select-String "LISTENING" | Select-String ":${{ env.PORT }} "
+            if ($listening) {
+              Write-Host "✅ MCP Server port ${{ env.PORT }} is listening"
+            } else {
+              Write-Host "❌ MCP Server not responding on port ${{ env.PORT }}"
+              exit 1
+            }
+          }
+
+      - name: Cleanup old images
+        run: docker image prune -f

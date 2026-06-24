@@ -1,0 +1,17 @@
+.git/
+.github/
+.idea/
+__pycache__/
+*.pyc
+*.md
+.gitignore
+.dockerignore
+.python-version
+.DS_Store
+Thumbs.db
+.env
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
