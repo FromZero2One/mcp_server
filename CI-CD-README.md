@@ -9,7 +9,7 @@ Python MCP Server 项目，使用 GitHub Actions 实现自动化 CI/CD 流水线
 ## 一、架构图
 
 ```
-git push (main)
+git push (master)
       │
       ▼
 ┌─────────────────────────────────────────┐
@@ -68,7 +68,7 @@ E:\Project\mcp_server/
 |-----|---------|---------|------|
 | **lint** | push/PR 自动 | ubuntu-latest | Ruff 代码风格检查 |
 | **test** | lint 通过 | ubuntu-latest | pytest 单元测试（无测试则跳过） |
-| **docker** | main 分支, test通过 | ubuntu-latest | 构建 Docker 镜像，推送到 ghcr.io |
+| **docker** | master 分支, test通过 | ubuntu-latest | 构建 Docker 镜像，推送到 ghcr.io |
 
 ### Manual Deploy (deploy.yml)
 
@@ -166,15 +166,15 @@ Get-Service "actions.runner.*"
 镜像存储在 GitHub Container Registry：
 
 ```
-ghcr.io/{owner}/mcp-server-demo:latest
+ghcr.io/{owner}/mcp_server:latest
 ```
 
 ```powershell
 # 手动拉取
-docker pull ghcr.io/{owner}/mcp-server-demo:latest
+docker pull ghcr.io/{owner}/mcp_server:latest
 
 # 查看构建时间
-docker inspect ghcr.io/{owner}/mcp-server-demo:latest --format "{{.Created}}"
+docker inspect ghcr.io/{owner}/mcp_server:latest --format "{{.Created}}"
 ```
 
 ---

@@ -5,7 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/fromzero2one/mcp-server-demo
+  IMAGE: ghcr.io/fromzero2one/mcp_server
   CONTAINER_NAME: mcp-server
   PORT: 8000
 
